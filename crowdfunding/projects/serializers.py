@@ -9,7 +9,8 @@ class ProjectSerializer(serializers.Serializer):
     image = serializers.URLField()
     is_open = serializers.BooleanField()
     date_ending = serializers.DateTimeField()
-    owner = serializers.CharField(max_length=200) 
+    owner = serializers.CharField(max_length=200)
+    category = serializers.CharField(max_length=200) 
 
 
     def create(self, validated_data):
