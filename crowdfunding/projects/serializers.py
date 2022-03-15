@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Project
+from .models import Project, Pledge
 
 class ProjectSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
@@ -8,7 +8,7 @@ class ProjectSerializer(serializers.Serializer):
     goal = serializers.IntegerField()
     image = serializers.URLField()
     is_open = serializers.BooleanField()
-    date_ending = serializers.DateTimeField()
+    date_created = serializers.DateTimeField()
     owner = serializers.CharField(max_length=200)
     category = serializers.CharField(max_length=200) 
 
@@ -17,3 +17,17 @@ class ProjectSerializer(serializers.Serializer):
         return Project.objects.create(**validated_data)
 
 
+class PledgeSerializer(serializers.Serializer):
+    id = serializers.ReadOnlyField()
+    amount = serializers.IntegerField()
+    comment = serializers.CharField(max_length=200)
+    anonymous = serializers.BooleanField()
+    supporter = serializers.CharField(max_length=200)
+    project_id = serializers.IntegerField()
+    
+    def create(self, validated_data):
+        return Pledge.objects.create(**validated_data)
+
+
+class ProjectDetailSerializer(ProjectSerializer):
+    pledges = PledgeSerializer(many=True, read_only=True)
