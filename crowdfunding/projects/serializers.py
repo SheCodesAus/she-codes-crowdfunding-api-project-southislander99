@@ -8,7 +8,9 @@ class ProjectSerializer(serializers.Serializer):
     goal = serializers.IntegerField()
     image = serializers.URLField()
     is_open = serializers.BooleanField()
-    date_created = serializers.DateTimeField()
+    date_created = serializers.ReadOnlyField()
+    date_start = serializers.DateTimeField()
+    date_ending = serializers.DateTimeField()
     owner = serializers.ReadOnlyField(source='owner.id')
     category = serializers.CharField(max_length=200) 
 

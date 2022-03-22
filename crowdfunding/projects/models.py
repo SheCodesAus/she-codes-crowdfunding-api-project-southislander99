@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+  
 
 
 class Project(models.Model):
@@ -8,7 +9,9 @@ class Project(models.Model):
     goal = models.IntegerField()
     image = models.URLField()
     is_open = models.BooleanField()
-    date_created = models.DateTimeField()
+    date_created = models.DateTimeField(auto_now=True, null=True)
+    date_start = models.DateTimeField(null=True)
+    date_ending = models.DateTimeField(null=True)
     category = models.CharField(max_length=200) 
     owner = models.ForeignKey(
         get_user_model(),
