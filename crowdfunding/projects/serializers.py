@@ -18,6 +18,14 @@ class ProjectSerializer(serializers.Serializer):
     def create(self, validated_data):
         return Project.objects.create(**validated_data)
 
+class Category(serializers.Serializer):
+    id = serializers.ReadOnlyField()
+    category_name = serializers.CharField(max_length=50, primary_key=True)
+    description = serializers.CharField(max_length=200) 
+
+    def create(self, validated_data):
+        return Category.objects.create(**validated_data)
+
 
 class PledgeSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
@@ -41,6 +49,8 @@ class ProjectDetailSerializer(ProjectSerializer):
         instance.image = validated_data.get('image', instance.image)
         instance.is_open = validated_data.get('is_open', instance.is_open)
         instance.date_created = validated_data.get('date_created', instance.date_created)
+        instance.date_start = validated_data.get('date_start', instance.date_start)
+        instance.date_ending = validated_data.get('date_ending', instance.date_ending)
         instance.owner = validated_data.get('owner', instance.owner)
         instance.category = validated_data.get('category', instance.category)
         instance.save()

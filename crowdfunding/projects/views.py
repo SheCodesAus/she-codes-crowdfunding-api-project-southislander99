@@ -2,6 +2,7 @@ from django.http import Http404
 from rest_framework import status, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.pagination import LimitOffsetPagination
 from .models import Project, Pledge
 from .serializers import ProjectSerializer, PledgeSerializer, ProjectDetailSerializer
 from .permissions import IsOwnerOrReadOnly
@@ -11,6 +12,9 @@ class ProjectList(APIView):
 
     def get(self, request):
         projects = Project.objects.all()
+        paginator = LimitOffsetPagination()
+        result_page = paginator.paginate_queryset(projects, request)
+        
         serializer = ProjectSerializer(projects, many=True)
         return Response(serializer.data)
 
