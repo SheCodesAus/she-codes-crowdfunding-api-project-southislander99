@@ -23,7 +23,7 @@ class Project(models.Model):
     )
 
 class Category(models.Model):
-    category_name = models.CharField(max_length=50, primary_key=True)
+    category_name = models.CharField(max_length=50)
     description = models.CharField(max_length=200) 
  
 class Pledge(models.Model):

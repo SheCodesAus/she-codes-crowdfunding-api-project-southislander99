@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Project, Pledge
+from .models import Project, Pledge, Category
 
 class ProjectSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
@@ -18,9 +18,9 @@ class ProjectSerializer(serializers.Serializer):
     def create(self, validated_data):
         return Project.objects.create(**validated_data)
 
-class Category(serializers.Serializer):
+class CategorySerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
-    category_name = serializers.CharField(max_length=50, primary_key=True)
+    category_name = serializers.CharField(max_length=50)
     description = serializers.CharField(max_length=200) 
 
     def create(self, validated_data):
