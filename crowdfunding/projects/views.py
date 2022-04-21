@@ -1,12 +1,12 @@
 from django.http import Http404
 from django.db.models import Max, Count
-from rest_framework import status, permissions
+from rest_framework import status, permissions, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
 from .models import Project, Pledge, Category
 from .serializers import ProjectSerializer, PledgeSerializer, ProjectDetailSerializer, CategorySerializer
-from .permissions import IsOwnerOrReadOnly
+from .permissions import IsOwnerOrReadOnly, IsAuthorOrReadOnly
 
 class ProjectList(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -43,7 +43,7 @@ class ProjectList(APIView):
         paginator = LimitOffsetPagination()
         result_page = paginator.paginate_queryset(projects, request)
 
-        serializer = ProjectSerializer(projects, many=True)
+        serializer = ProjectSerializer(result_page, many=True)
         return Response(serializer.data)
 
     def post(self, request):
@@ -60,25 +60,14 @@ class ProjectList(APIView):
         )
 
 class CategoryList(APIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    serializer_class = CategorySerializer
+    queryset = Category.objects.all()
 
-    def get(self, request):
-        category = Category.objects.all()
-        serializer = CategorySerializer(category, many=True)
-        return Response(serializer.data)
+class CategoryDetailApi(generics.RetrieveUpdateDestriyAPIView):
+    permissions_classes = [permissions.IsAuthenticatedOrReadonly, IsAuthorOrReadOnly]
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
-    def post(self, request):
-        serializer = CategorySerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(owner=request.user)
-            return Response(
-                serializer.data,
-                status=status.HTTP_201_CREATED
-                )
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
 
 class ProjectDetail(APIView):
     permission_classes = [

@@ -13,8 +13,11 @@ class Project(models.Model):
     #category = models.CharField(max_length=200)
     category = models.ForeignKey(
         'Category',
-        on_delete=models.CASCADE,
-        default='Uncategorised'
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        default='Uncategorised',
+        related_name='projects'
     )
     owner = models.ForeignKey(
         get_user_model(),
@@ -24,7 +27,10 @@ class Project(models.Model):
 
 class Category(models.Model):
     category_name = models.CharField(max_length=50)
-    description = models.CharField(max_length=200) 
+    description = models.CharField(max_length=200)
+
+    def __str__(self) -> str:
+        return self.name
  
 class Pledge(models.Model):
     amount = models.IntegerField()
