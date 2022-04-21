@@ -62,7 +62,7 @@ class ProjectList(APIView):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-class CategoryList(APIView):
+class CategoryList(generics.ListCreateAPIView):
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
 
@@ -80,7 +80,6 @@ class ProjectDetail(APIView):
 
     def get_objects(self, pk):
         try:
-            #return Project.objects.get(pk=pk)
             project = Project.objects.get(pk=pk)
             self.check_object_permissions(self.request, project)
             return project
@@ -94,10 +93,10 @@ class ProjectDetail(APIView):
 
     def put(self, request, pk):
         project = self.get_object(pk)
-        date = request.data
+        data = request.data
         serializer = ProjectDetailSerializer(
             instance = project,
-            data = date,
+            data = data,
             partial = True
         )
         if serializer.is_valid():

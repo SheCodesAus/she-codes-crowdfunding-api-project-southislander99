@@ -3,21 +3,26 @@ from django.db import models
 
 User = get_user_model()
 
-class Project(models.Model):
+class BaseModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    modefied_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+class Project(BaseModel):
     title = models.CharField(max_length=200)
     description = models.TextField()
     goal = models.IntegerField()
     image = models.URLField()
     is_open = models.BooleanField()
-    date_created = models.DateTimeField(auto_now=True, null=True)
-    date_start = models.DateTimeField(null=True)
-    date_ending = models.DateTimeField(null=True)
+    date_start = models.DateTimeField()
+    date_ending = models.DateTimeField()
     #category = models.CharField(max_length=200)
     category = models.ForeignKey(
         'Category',
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         null=True,
-        blank=True,
         default='Uncategorised',
         related_name='category_projects'
     )
@@ -29,16 +34,15 @@ class Project(models.Model):
 
 class Category(models.Model):
     category_name = models.CharField(max_length=50)
-    description = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True)
 
     def __str__(self) -> str:
         return self.name
  
-class Pledge(models.Model):
+class Pledge(BaseModel):
     amount = models.IntegerField()
     comment = models.CharField(max_length=200)
     anonymous = models.BooleanField()
-    date_created = models.DateTimeField(auto_now=True, null=True)
     project = models.ForeignKey(
         'Project',
         on_delete=models.CASCADE,

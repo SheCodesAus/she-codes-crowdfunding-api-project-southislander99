@@ -10,11 +10,14 @@ class ProjectSerializer(serializers.Serializer):
     goal = serializers.IntegerField()
     image = serializers.URLField()
     is_open = serializers.BooleanField()
-    date_created = serializers.ReadOnlyField()
+    created_at = serializers.DateTimeField(read_only=True)
+    modified_at = serializers.DateTimeField(read_only=True)
     date_start = serializers.DateTimeField()
     date_ending = serializers.DateTimeField()
     owner = serializers.ReadOnlyField(source='owner.id')
-    category = serializers.ReadOnlyField(source='category.id')
+    category = serializers.SlugRelatedField(
+        slug_field="slug", queryset=Category.objects.all()
+    )
     total_pledged = serializers.SerializerMethodField()
 
     def get_total_pledged(self, obj):
