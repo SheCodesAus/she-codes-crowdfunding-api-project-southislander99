@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db import models  
 
+User = get_user_model()
+
 class Project(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
@@ -17,7 +19,7 @@ class Project(models.Model):
         null=True,
         blank=True,
         default='Uncategorised',
-        related_name='projects'
+        related_name='category_projects'
     )
     owner = models.ForeignKey(
         get_user_model(),

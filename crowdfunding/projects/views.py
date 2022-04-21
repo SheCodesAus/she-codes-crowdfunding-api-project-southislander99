@@ -1,12 +1,15 @@
 from django.http import Http404
 from django.db.models import Max, Count
+
 from rest_framework import status, permissions, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
+
 from .models import Project, Pledge, Category
+from .permissions import IsOwnerOrReadOnly
 from .serializers import ProjectSerializer, PledgeSerializer, ProjectDetailSerializer, CategorySerializer
-from .permissions import IsOwnerOrReadOnly, IsAuthorOrReadOnly
+
 
 class ProjectList(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -63,8 +66,8 @@ class CategoryList(APIView):
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
 
-class CategoryDetailApi(generics.RetrieveUpdateDestriyAPIView):
-    permissions_classes = [permissions.IsAuthenticatedOrReadonly, IsAuthorOrReadOnly]
+class CategoryDetailApi(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly,]
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
@@ -72,7 +75,7 @@ class CategoryDetailApi(generics.RetrieveUpdateDestriyAPIView):
 class ProjectDetail(APIView):
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
-        IsOwnerOrReadOnly
+        IsOwnerOrReadOnly,
         ]
 
     def get_objects(self, pk):
