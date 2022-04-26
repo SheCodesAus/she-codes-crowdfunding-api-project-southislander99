@@ -1,7 +1,8 @@
 from unittest.util import _MAX_LENGTH
 from rest_framework import serializers
 from django.db.models import Sum
-from .models import Project, Pledge, Category
+from .models import Project, Pledge, Category, Comment
+
 
 class ProjectSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
@@ -28,10 +29,11 @@ class ProjectSerializer(serializers.Serializer):
     def create(self, validated_data):
         return Project.objects.create(**validated_data)
 
+
 class CategorySerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
     category_name = serializers.CharField(max_length=50)
-    description = serializers.CharField(max_length=200) 
+    slug = serializers.SlugField() 
 
     def create(self, validated_data):
         return Category.objects.create(**validated_data)
@@ -41,6 +43,22 @@ class CategorySerializer(serializers.Serializer):
         instance.description = validated_data.get('description',instance.description)
         instance.save()
         return instance
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(slug_field="username",read_only="true",)
+
+    class Meta:
+        model = Comment
+        exclude = ['visible']
+
+
+class ProjectCommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(slug_field="username", read_only="true",)
+
+    class Meta:
+        model = Comment
+        exclude = ["visible", "project"]
 
 
 class PledgeSerializer(serializers.Serializer):
@@ -58,6 +76,7 @@ class PledgeSerializer(serializers.Serializer):
 
 class ProjectDetailSerializer(ProjectSerializer):
     pledges = PledgeSerializer(many=True, read_only=True)
+    comments = CommentSerializer(many=True, read_only=True)
 
     def update(self, instance, validated_data):
         instance.title = validated_data.get('title', instance.title)

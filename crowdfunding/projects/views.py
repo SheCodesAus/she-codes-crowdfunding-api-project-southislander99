@@ -6,9 +6,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
 
-from .models import Project, Pledge, Category
+from .models import Project, Pledge, Category, Comment
 from .permissions import IsOwnerOrReadOnly
-from .serializers import ProjectSerializer, PledgeSerializer, ProjectDetailSerializer, CategorySerializer
+from .serializers import ProjectSerializer, PledgeSerializer, ProjectDetailSerializer, CategorySerializer, CommentSerializer, ProjectCommentSerializer
 
 
 class ProjectList(APIView):
@@ -66,10 +66,20 @@ class CategoryList(generics.ListCreateAPIView):
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
 
-class CategoryDetailApi(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly,]
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
+class CategoryDetail(APIView):
+    
+    def get_object(self, **kwargs):
+        try:
+            if "slug" in kwargs:
+                return Category.objects.get(slug=kwargs["slug"])
+            return Category.objects.get(pk=kwargs["pk"])
+        except Category.DoesNotExist:
+            raise Http404
+    
+    def get(self, request, **kwargs):
+        category = self.get_object(**kwargs)
+        serializer = CategorySerializer(category)
+        return Response(serializer.data)
 
 
 class ProjectDetail(APIView):
@@ -101,6 +111,13 @@ class ProjectDetail(APIView):
         )
         if serializer.is_valid():
             serializer.save()
+            return Response(serializer.errors, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        project = self.get_object(pk)
+        project.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class PledgeList(APIView):
     
@@ -124,3 +141,34 @@ class PledgeList(APIView):
         return Response(
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST)
+
+
+class CommentList(generics.ListCreateAPIView):
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly
+    ]
+    queryset = Comment.objects.filter(visible=True)
+    serializer_class = CommentSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOrReadOnly
+    ]
+    queryset = Comment.objects.filter(visible=True)
+    serializer_class = CommentSerializer
+
+class ProjectCommentList(generics.ListCreateAPIView):
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly
+    ]
+    serializer_class = ProjectCommentSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user, project_id=self.kwargs.get("pk"))
+
+    def get_queryset(self):
+        return Comment.objects.filter(project_id=self.kwargs.get("pk"))

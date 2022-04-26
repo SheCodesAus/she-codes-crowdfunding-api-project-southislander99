@@ -32,12 +32,15 @@ class Project(BaseModel):
         related_name='owner_projects'
     )
 
-class Category(models.Model):
+    def save(self, **kwargs):
+        super().save(**kwargs)
+        # then check for badges
+        self.owner.badge_check('owner_projects')
+
+class Category(BaseModel):
     category_name = models.CharField(max_length=50)
     slug = models.SlugField(unique=True)
 
-    def __str__(self) -> str:
-        return self.name
  
 class Pledge(BaseModel):
     amount = models.IntegerField()
@@ -53,3 +56,22 @@ class Pledge(BaseModel):
         on_delete=models.CASCADE,
         related_name='supporter_pledges'
         )
+
+    def save(self, **kwargs):
+        super().save(**kwargs)
+        # then check for badges
+        self.supporter.badge_check('supporter_pledges')
+
+class Comment(BaseModel):
+    project = models.ForeignKey(
+        'Project',
+        on_delete=models.CASCADE,
+        related_name="comments"
+        )
+    author = models.ForeignKey(
+        'User',
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="comments")
+    body = models.TextField()
+    visible = models.BooleanField(default=True)
