@@ -9,7 +9,7 @@ urlpatterns = [
     path('category/<int:pk>', views.CategoryDetail.as_view()),
     path('pledges/', views.PledgeList.as_view()),
     path('comments/', views.CommentList.as_view()),
-    path("comment/<int:pk>/", views.CommentDetailApi.as_view()),
+    path("comment/<int:pk>/", views.CommentDetail.as_view()),
     path('projects/comment/<int:pk>/', views.CommentDetail.as_view()),
 ]
 

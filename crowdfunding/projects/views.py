@@ -153,6 +153,7 @@ class CommentList(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
+
 class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
@@ -160,6 +161,7 @@ class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
     ]
     queryset = Comment.objects.filter(visible=True)
     serializer_class = CommentSerializer
+
 
 class ProjectCommentList(generics.ListCreateAPIView):
     permission_classes = [

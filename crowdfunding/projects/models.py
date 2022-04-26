@@ -4,7 +4,7 @@ from django.db import models
 User = get_user_model()
 
 class BaseModel(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
     modefied_at = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -39,7 +39,7 @@ class Project(BaseModel):
 
 class Category(BaseModel):
     category_name = models.CharField(max_length=50)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, null=True)
 
  
 class Pledge(BaseModel):
@@ -69,9 +69,9 @@ class Comment(BaseModel):
         related_name="comments"
         )
     author = models.ForeignKey(
-        'User',
+        get_user_model(),
         on_delete=models.SET_NULL,
         null=True,
-        related_name="comments")
+        related_name="author_comments")
     body = models.TextField()
     visible = models.BooleanField(default=True)
