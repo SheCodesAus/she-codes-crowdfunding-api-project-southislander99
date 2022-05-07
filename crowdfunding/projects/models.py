@@ -16,6 +16,7 @@ class Project(BaseModel):
     goal = models.IntegerField()
     image = models.URLField()
     is_open = models.BooleanField()
+    date_created = models.DateTimeField(null=True)
     date_start = models.DateTimeField()
     date_ending = models.DateTimeField()
     #category = models.CharField(max_length=200)

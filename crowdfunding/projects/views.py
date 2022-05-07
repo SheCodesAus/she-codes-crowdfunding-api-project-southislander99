@@ -102,7 +102,7 @@ class ProjectDetail(APIView):
         return Response(serializer.data)
 
     def put(self, request, pk):
-        project = self.get_object(pk)
+        project = self.get_objects(pk)
         data = request.data
         serializer = ProjectDetailSerializer(
             instance = project,
@@ -115,7 +115,7 @@ class ProjectDetail(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
-        project = self.get_object(pk)
+        project = self.get_objects(pk)
         project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
